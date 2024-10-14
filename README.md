@@ -2,7 +2,7 @@
 
 # Project Modules
 
-## 1. Authentication and Authorization Module (Person 1)
+## 1. Authentication and Authorization Module (Mahammad)
 **Description:** This module is responsible for user login and account creation, ensuring that students and admins are correctly authenticated and authorized.
 
 **Key Features:**
@@ -19,7 +19,7 @@
 - `login.sh`: For both students and admins to log in.
 - `auth.sh`: Handle session and role-based redirection (i.e., send students to student menu and admins to admin menu).
 
-## 2. Student Operations Module (Person 2)
+## 2. Student Operations Module (Szymon)
 **Description:** This module is responsible for all operations that students can perform after they log in, such as registering and withdrawing from courses.
 
 **Key Features:**
@@ -39,7 +39,7 @@
 - `withdraw_course.sh`: Withdraw the student from a course.
 - Ensure all operations are linked to the logged-in student's account.
 
-## 3. Admin Operations Module (Person 3)
+## 3. Admin Operations Module (Ahmed)
 **Description:** The admin is responsible for managing the system data, including creating, viewing, and deleting both student and course records. Admins can also register/unregister students from courses.
 
 **Key Features:**
