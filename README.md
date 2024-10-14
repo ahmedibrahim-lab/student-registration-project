@@ -84,13 +84,14 @@ This table holds additional information about students. It links to the Users ta
 
 | Column      | Data Type         | Description                                                         |
 |-------------|-------------------|---------------------------------------------------------------------|
-| student_id  | INT (PK, FK)      | References `user_id` from the Users table. This ensures that each student has a corresponding user account. |
+| student_id  | INT (PK)          |  This ensures that each student has a corresponding user account.   |
 | name        | VARCHAR(100)      | Full name of the student.                                          |
 | email       | VARCHAR(100)      | Email address of the student.                                      |
 | phone       | VARCHAR(20)       | Contact number of the student.                                     |
+| user_id     | INT (FK)          | References `user_id` from the Users table.                         |
 
 **Primary Key:** `student_id`  
-**Foreign Key:** `student_id` references `user_id` in the Users table.  
+**Foreign Key:** `user_id` references `user_id` in the Users table.  
 **Purpose:** Stores detailed information about students, including contact details.
 
 ---
