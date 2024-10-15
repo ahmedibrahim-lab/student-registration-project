@@ -1,11 +1,12 @@
 #!/bin/bash
 
-# Database credentials for Docker MySQL
+# Database credentials
 USER="root"
-PASSWORD="root_password"
-DB="appDb"
-HOST="127.0.0.1"
-PORT="3306"
+#PASSWORD="root_password"
+#DB="appDb"
+#HOST="127.0.0.1"
+#PORT="3306"
+DB="StudentRegistration"
 
 # Prompt user for input
 echo "Enter your desired username:"
@@ -27,17 +28,21 @@ read phone
 hashed_password=$(echo -n "$password" | md5sum | awk '{print $1}')
 
 # Check if the username already exists
-user_exists=$(mysql -u $USER -p$PASSWORD -h $HOST -P $PORT -D $DB -s -N -e "SELECT COUNT(*) FROM users WHERE username='$username';")
+#user_exists=$(mysql -u $USER -p$PASSWORD -h $HOST -P $PORT -D $DB -s -N -e "SELECT COUNT(*) FROM users WHERE username='$username';")
+user_exists=$(sudo mysql -u $USER -D $DB -s -N -e "SELECT COUNT(*) FROM Users WHERE username='$username';")
 
 if [ $user_exists -eq 0 ]; then
     # Insert into the 'users' table (with role = 'student')
-    mysql -u $USER -p$PASSWORD -h $HOST -P $PORT -D $DB -e "INSERT INTO users (username, password, role) VALUES ('$username', '$hashed_password', 'student');"
+    #mysql -u $USER -p$PASSWORD -h $HOST -P $PORT -D $DB -e "INSERT INTO users (username, password, role) VALUES ('$username', '$hashed_password', 'student');"
+    sudo mysql -u $USER -D $DB -e "INSERT INTO Users (username, password, role) VALUES ('$username', '$hashed_password', 'student');"
     
     # Get the newly created user_id
-    user_id=$(mysql -u $USER -p$PASSWORD -h $HOST -P $PORT -D $DB -s -N -e "SELECT user_id FROM users WHERE username='$username';")
+    #user_id=$(mysql -u $USER -p$PASSWORD -h $HOST -P $PORT -D $DB -s -N -e "SELECT user_id FROM users WHERE username='$username';")
+    user_id=$(sudo mysql -u $USER -D $DB -s -N -e "SELECT user_id FROM Users WHERE username='$username';")
     
     # Insert additional details into the 'students' table
-    mysql -u $USER -p$PASSWORD -h $HOST -P $PORT -D $DB -e "INSERT INTO students (student_id, name, email, phone) VALUES ('$user_id', '$name', '$email', '$phone');"
+    #mysql -u $USER -p$PASSWORD -h $HOST -P $PORT -D $DB -e "INSERT INTO students (student_id, name, email, phone) VALUES ('$user_id', '$name', '$email', '$phone');"
+    sudo mysql -u $USER -D $DB -e "INSERT INTO students (student_id, name, email, phone) VALUES ('$user_id', '$name', '$email', '$phone');"
     
     echo "Account created successfully!"
 else

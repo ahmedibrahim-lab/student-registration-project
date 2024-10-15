@@ -2,11 +2,11 @@
 
 # Database credentials
 USER="root"
-PASSWORD="root_password"
-DB="appDb"
-HOST="127.0.0.1"
-PORT="3306"
-
+#PASSWORD="root_password"
+#DB="appDb"
+#HOST="127.0.0.1"
+#PORT="3306"
+DB="StudentRegistration"
 
 
 # Prompt user for input
@@ -20,7 +20,8 @@ read -s password
 hashed_password=$(echo -n "$password" | md5sum | awk '{print $1}')
 
 # Check if the username and password match
-user_info=$(mysql -u $USER -p$PASSWORD -h $HOST -D $DB -s -N -e "SELECT username, role FROM users WHERE username='$username' AND password='$hashed_password';")
+#user_info=$(mysql -u $USER -p$PASSWORD -h $HOST -D $DB -s -N -e "SELECT username, role FROM users WHERE username='$username' AND password='$hashed_password';")
+user_info=$(sudo mysql -u $USER -D $DB -s -N -e "SELECT username, role FROM Users WHERE username='$username' AND password='$hashed_password';")
 
 if [ -z "$user_info" ]; then
     echo "Invalid username or password."
