@@ -136,3 +136,14 @@ This table manages the many-to-many relationship between students and courses. E
 - **Courses → Registrations:** One-to-many relationship where a course can have multiple students registered.
 - **Registrations:** Acts as the bridge for the many-to-many relationship between Students and Courses.
 
+## Codespaces:
+
+- Run the following command to start mysql service.
+```
+sudo service mysql start
+```
+- You can access the sql cli by running the following command. There is no password.
+```
+sudo mysql -u root -p
+```
+
