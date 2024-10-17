@@ -1,11 +1,13 @@
 #!/bin/bash
 
 # Database credentials
-USER="root"
+
 #PASSWORD="root_password"
 #DB="appDb"
 #HOST="127.0.0.1"
 #PORT="3306"
+
+USER="root"
 DB="StudentRegistration"
 
 # Retrieve and display all courses
