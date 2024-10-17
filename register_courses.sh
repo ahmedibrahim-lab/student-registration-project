@@ -1,48 +1,77 @@
 #!/bin/bash
 
-#mysql datas
-USER="root"
-PASSWORD="root"
-DB="studentRegistrationProject"
-HOST="127.0.0.1"
-PORT="3306"
+# Environment switch: Set to either "local" or "codespaces"
+ENVIRONMENT="codespaces"
 
-#check if the session exists
-if [ ! session.txt ]; then
-        echo "You are not logged in!"
-        exit 1
+# Database credentials for local environment
+LOCAL_USER="root"
+LOCAL_PASSWORD="root"
+LOCAL_DB="studentRegistrationProject"
+LOCAL_HOST="127.0.0.1"
+LOCAL_PORT="3306"
+
+# Database credentials for codespaces environment
+CODESPACES_USER="root"
+CODESPACES_DB="StudentRegistration"
+
+# Database variables (These will be updated based on ENVIRONMENT)
+USER=""
+PASSWORD=""
+DB=""
+HOST=""
+PORT=""
+MYSQL_CMD=""
+
+# Set environment-specific variables
+if [ "$ENVIRONMENT" == "local" ]; then
+    USER=$LOCAL_USER
+    PASSWORD=$LOCAL_PASSWORD
+    DB=$LOCAL_DB
+    HOST=$LOCAL_HOST
+    PORT=$LOCAL_PORT
+    MYSQL_CMD="mysql -u $USER -p$PASSWORD -h $HOST -P $PORT -D $DB -s -N"
+elif [ "$ENVIRONMENT" == "codespaces" ]; then
+    USER=$CODESPACES_USER
+    DB=$CODESPACES_DB
+    MYSQL_CMD="sudo mysql -u $USER -D $DB -s -N"
 fi
 
-#get student's id
-student_id=$(cat session.txt | grep "user_id")
+# Check if the session exists
+if [ ! -f session.txt ]; then
+    echo "You are not logged in!"
+    exit 1
+fi
 
-#show courses user is already registered
+# Get the student's ID from session.txt
+student_id=$(cat session.txt | grep "user_id" | awk -F= '{print $2}')
+
+# Show courses the user is already registered for
 echo "Your courses: "
-sudo mysql -u $USER -p$PASSWORD -h $HOST -P $PORT -D $DB -e "
-SELECT Courses.id, Courses.course_name 
+$MYSQL_CMD -e "
+SELECT Courses.course_id, Courses.course_code, Courses.course_name 
 FROM Courses 
-JOIN Registration ON Courses.id = Registration.course_id 
-WHERE Registration.student_id = '$student_is';
+JOIN Registrations ON Courses.course_id = Registrations.course_id 
+WHERE Registrations.student_id = '$student_id';
 "
 
-#show available courses to register
+# Show available courses to register for
 echo "Available courses: "
-sudo mysql -u $USER -p$PASSWORD -h $HOST -P $PORT -D $DB -e "
-SELECT id, course_name, description, credits 
+$MYSQL_CMD -e "
+SELECT course_id, course_name, instructor, credits 
 FROM Courses 
-WHERE id NOT IN (
-SELECT course_id FROM Registration WHERE student_id='$student_id'
+WHERE course_id NOT IN (
+    SELECT course_id FROM Registrations WHERE student_id='$student_id'
 );
 "
 
-# ask user of course id
+# Ask user for course ID to register
 read -p "Enter ID of course to register: " course_id
 
-# check if this course exists
-course_exists=$(mysql -u $USER -p$PASSWORD -h $HOST -P $PORT -D $DB -sse "
+# Check if the course exists
+course_exists=$($MYSQL_CMD -sse "
 SELECT COUNT(*) 
 FROM Courses 
-WHERE id = '$course_id';
+WHERE course_id = '$course_id';
 ")
 
 if [ "$course_exists" -eq 0 ]; then
@@ -50,12 +79,10 @@ if [ "$course_exists" -eq 0 ]; then
     exit 1
 fi
 
-# register user to a course
-mysql -u $USER -p$PASSWORD -h $HOST -P $PORT -D $DB -e "
+# Register the user for the selected course
+$MYSQL_CMD -e "
 INSERT INTO Registrations (student_id, course_id)
 VALUES ('$student_id', '$course_id');
 "
 
-echo "You got registered to course: $course_id"
-
-
+echo "You got registered for course: $course_id"

@@ -1,39 +1,67 @@
 #!/bin/bash
 
-#mysql datas
-USER="root"
-PASSWORD="root"
-DB="studentRegistrationProject"
-HOST="127.0.0.1"
-PORT="3306"
+# Environment switch: Set to either "local" or "codespaces"
+ENVIRONMENT="codespaces"
 
-#check if the session exists
-if [ ! session.txt ]; then
-        echo "You are not logged in!"
-        exit 1
+# Database credentials for local environment
+LOCAL_USER="root"
+LOCAL_PASSWORD="root_password"
+LOCAL_DB="studentRegistrationProject"
+LOCAL_HOST="127.0.0.1"
+LOCAL_PORT="3306"
+
+# Database credentials for Codespaces environment
+CODESPACES_USER="root"
+CODESPACES_DB="StudentRegistration"
+
+# Database variables (These will be updated based on ENVIRONMENT)
+USER=""
+PASSWORD=""
+DB=""
+HOST=""
+PORT=""
+MYSQL_CMD=""
+
+# Set environment-specific variables
+if [ "$ENVIRONMENT" == "local" ]; then
+    USER=$LOCAL_USER
+    PASSWORD=$LOCAL_PASSWORD
+    DB=$LOCAL_DB
+    HOST=$LOCAL_HOST
+    PORT=$LOCAL_PORT
+    MYSQL_CMD="mysql -u $USER -p$PASSWORD -h $HOST -P $PORT -D $DB"
+elif [ "$ENVIRONMENT" == "codespaces" ]; then
+    USER=$CODESPACES_USER
+    DB=$CODESPACES_DB
+    MYSQL_CMD="sudo mysql -u $USER -D $DB"
 fi
 
-#get the id of logged in user
-student_id=$(cat session.txt | grep "user_id")
+# Check if the session exists
+if [ ! -f session.txt ]; then
+    echo "You are not logged in!"
+    exit 1
+fi
 
-#show student courses
+# Get the ID of the logged-in user
+student_id=$(grep "user_id" session.txt | awk -F '=' '{print $2}')
+
+# Show student courses
 echo "===== Your courses ====="
-sudo mysql -u $USER -p$PASSWORD -h $HOST -P $PORT -D $DB -e "
-SELECT Courses.id, Courses.course_name 
+$MYSQL_CMD -e "
+SELECT Courses.course_id, Courses.course_name 
 FROM Courses 
-JOIN Registration ON Courses.id = Registration.course_id 
-WHERE Registration.student_id='$student_id';
+JOIN Registrations ON Courses.course_id = Registrations.course_id 
+WHERE Registrations.student_id='$student_id';
 "
 
-
-echo "Insert the ID of course You want withdraw: "
+echo "Insert the ID of the course you want to withdraw from: "
 read course_id
 
-# check if the course exists
-course_exists=$(mysql -u $USER -p$PASSWORD -h $HOST -P $PORT -D $DB -sse "
+# Check if the course exists
+course_exists=$($MYSQL_CMD -sse "
 SELECT COUNT(*) 
 FROM Courses 
-WHERE id = '$course_id';
+WHERE course_id = '$course_id';
 ")
 
 if [ "$course_exists" -eq 0 ]; then
@@ -41,20 +69,19 @@ if [ "$course_exists" -eq 0 ]; then
     exit 1
 fi
 
-#check if student is registered
-exists=$(sudo mysql -u $USER -p $PASSWORD -h $HOST -P $PORT -D $DB -e "
-SELECT * FROM Registration 
+# Check if the student is registered
+exists=$($MYSQL_CMD -e "
+SELECT * FROM Registrations 
 WHERE student_id='$student_id' AND course_id='$course_id';
 " | wc -l)
 
-#delete student from course
-if [ "$exists" -gt 1 ]; then
-	sudo mysql -u $USER -p$PASSWORD -h $HOST -P $PORT -D $DB -e "
-	DELETE FROM Registration 
-	WHERE student_id='$student_id' AND course_id='$course_id';
-	"
-	echo "You withdraw from a course: $course_id"
+# Delete student from course
+if [ "$exists" -gt 0 ]; then
+    $MYSQL_CMD -e "
+    DELETE FROM Registrations 
+    WHERE student_id='$student_id' AND course_id='$course_id';
+    "
+    echo "You have withdrawn from the course: $course_id"
 else
-	echo "You are not registered to this course"
+    echo "You are not registered in this course"
 fi
-

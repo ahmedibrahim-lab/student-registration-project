@@ -36,20 +36,18 @@ elif [ "$ENVIRONMENT" == "codespaces" ]; then
     MYSQL_CMD="sudo mysql -u $USER -D $DB -s -N"
 fi
 
-# Prompt user for course details
-echo "Enter the course code (e.g., CS101):"
+# Prompt admin for the student username and course code
+echo "Enter the username of the student to register:"
+read username
+
+echo "Enter the course code (e.g., CS101) to register the student for:"
 read course_code
 
-echo "Enter the course name:"
-read course_name
+# Find student ID and course ID
+student_id=$($MYSQL_CMD -e "SELECT student_id FROM Students WHERE student_id=(SELECT user_id FROM Users WHERE username='$username');")
+course_id=$($MYSQL_CMD -e "SELECT course_id FROM Courses WHERE course_code='$course_code';")
 
-echo "Enter the instructor's name:"
-read instructor
+# Register the student for the course
+$MYSQL_CMD -e "INSERT INTO Registrations (student_id, course_id, registration_date) VALUES ('$student_id', '$course_id', CURDATE());"
 
-echo "Enter the number of credits for the course:"
-read credits
-
-# Insert the course into the Courses table
-$MYSQL_CMD -e "INSERT INTO Courses (course_code, course_name, instructor, credits) VALUES ('$course_code', '$course_name', '$instructor', '$credits');"
-
-echo "Course $course_name has been successfully created!"
+echo "Student $username has been successfully registered for course $course_code!"

@@ -1,15 +1,40 @@
 #!/bin/bash
 
-# Database credentials (LOCAL)
-USER="root"
-PASSWORD="root_password"
-DB="appDb"
-HOST="127.0.0.1"
-PORT="3306"
+# Environment switch: Set to either "local" or "codespaces"
+ENVIRONMENT="codespaces"
 
-# Database credentials (CODESPACES)
-#USER="root"
-#DB="StudentRegistration"
+# Database credentials for local environment
+LOCAL_USER="root"
+LOCAL_PASSWORD="root_password"
+LOCAL_DB="appDb"
+LOCAL_HOST="127.0.0.1"
+LOCAL_PORT="3306"
+
+# Database credentials for codespaces environment
+CODESPACES_USER="root"
+CODESPACES_DB="StudentRegistration"
+
+# Database variables (These will be updated based on ENVIRONMENT)
+USER=""
+PASSWORD=""
+DB=""
+HOST=""
+PORT=""
+MYSQL_CMD=""
+
+# Set environment-specific variables
+if [ "$ENVIRONMENT" == "local" ]; then
+    USER=$LOCAL_USER
+    PASSWORD=$LOCAL_PASSWORD
+    DB=$LOCAL_DB
+    HOST=$LOCAL_HOST
+    PORT=$LOCAL_PORT
+    MYSQL_CMD="mysql -u $USER -p$PASSWORD -h $HOST -P $PORT -D $DB -s -N"
+elif [ "$ENVIRONMENT" == "codespaces" ]; then
+    USER=$CODESPACES_USER
+    DB=$CODESPACES_DB
+    MYSQL_CMD="sudo mysql -u $USER -D $DB -s -N"
+fi
 
 # Prompt user for input
 echo "Enter your desired username:"
@@ -30,33 +55,20 @@ read phone
 # Hash the password (using md5, you can use more secure hashing like sha256)
 hashed_password=$(echo -n "$password" | md5sum | awk '{print $1}')
 
-# Check if the username already exists 
-# LOCAL
-user_exists=$(mysql -u $USER -p$PASSWORD -h $HOST -P $PORT -D $DB -s -N -e "SELECT COUNT(*) FROM users WHERE username='$username';")
-# CODESPACES
-#user_exists=$(sudo mysql -u $USER -D $DB -s -N -e "SELECT COUNT(*) FROM Users WHERE username='$username';")
+# Check if the username already exists
+user_exists=$($MYSQL_CMD -e "SELECT COUNT(*) FROM Users WHERE username='$username';")
 
 if [ $user_exists -eq 0 ]; then
     # Insert into the 'users' table (with role = 'student')
-    # LOCAL
-    mysql -u $USER -p$PASSWORD -h $HOST -P $PORT -D $DB -e "INSERT INTO users (username, password, role) VALUES ('$username', '$hashed_password', 'student');"
-    # CODESPACES
-    #sudo mysql -u $USER -D $DB -e "INSERT INTO Users (username, password, role) VALUES ('$username', '$hashed_password', 'student');"
+    $MYSQL_CMD -e "INSERT INTO Users (username, password, role) VALUES ('$username', '$hashed_password', 'student');"
     
     # Get the newly created user_id
-    # LOCAL
-    user_id=$(mysql -u $USER -p$PASSWORD -h $HOST -P $PORT -D $DB -s -N -e "SELECT user_id FROM users WHERE username='$username';")
-    # CODESPACES
-    user_id=$(sudo mysql -u $USER -D $DB -s -N -e "SELECT user_id FROM Users WHERE username='$username';")
+    user_id=$($MYSQL_CMD -e "SELECT user_id FROM Users WHERE username='$username';")
     
     # Insert additional details into the 'students' table
-    # LOCAL
-    mysql -u $USER -p$PASSWORD -h $HOST -P $PORT -D $DB -e "INSERT INTO students (student_id, name, email, phone) VALUES ('$user_id', '$name', '$email', '$phone');"
-    # CODESPACES
-    sudo mysql -u $USER -D $DB -e "INSERT INTO students (student_id, name, email, phone) VALUES ('$user_id', '$name', '$email', '$phone');"
+    $MYSQL_CMD -e "INSERT INTO Students (student_id, name, email, phone) VALUES ('$user_id', '$name', '$email', '$phone');"
     
     echo "Account created successfully!"
 else
     echo "Username already exists. Please choose a different username."
 fi
-
