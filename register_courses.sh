@@ -6,7 +6,7 @@ ENVIRONMENT="codespaces"
 # Database credentials for local environment
 LOCAL_USER="root"
 LOCAL_PASSWORD="root"
-LOCAL_DB="studentRegistrationProject"
+LOCAL_DB="StudentRegistration"
 LOCAL_HOST="127.0.0.1"
 LOCAL_PORT="3306"
 
@@ -43,7 +43,8 @@ if [ ! -f session.txt ]; then
 fi
 
 # Get the student's ID from session.txt
-student_id=$(cat session.txt | grep "user_id" | awk -F= '{print $2}')
+user_id=$(cat session.txt | grep "user_id" | awk -F= '{print $2}')
+student_id=$($MYSQL_CMD -e "SELECT student_id FROM Students WHERE user_id='$user_id';")
 
 # Show courses the user is already registered for
 echo "Your courses: "
@@ -57,7 +58,7 @@ WHERE Registrations.student_id = '$student_id';
 # Show available courses to register for
 echo "Available courses: "
 $MYSQL_CMD -e "
-SELECT course_id, course_name, instructor, credits 
+SELECT course_id, course_name, description, credits 
 FROM Courses 
 WHERE course_id NOT IN (
     SELECT course_id FROM Registrations WHERE student_id='$student_id'
@@ -85,4 +86,4 @@ INSERT INTO Registrations (student_id, course_id)
 VALUES ('$student_id', '$course_id');
 "
 
-echo "You got registered for course: $course_id"
+echo "You $student_id got registered for course: $course_id"

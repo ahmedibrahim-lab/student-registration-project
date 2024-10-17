@@ -6,7 +6,7 @@ ENVIRONMENT="codespaces"
 # Database credentials for local environment
 LOCAL_USER="root"
 LOCAL_PASSWORD="root_password"
-LOCAL_DB="studentRegistrationProject"
+LOCAL_DB="StudentRegistration"
 LOCAL_HOST="127.0.0.1"
 LOCAL_PORT="3306"
 
@@ -43,12 +43,13 @@ if [ ! -f session.txt ]; then
 fi
 
 # Get the ID of the logged-in user
-student_id=$(grep "user_id" session.txt | awk -F '=' '{print $2}')
+user_id=$(cat session.txt | grep "user_id" | awk -F= '{print $2}')
+student_id=$($MYSQL_CMD -e "SELECT student_id FROM Students WHERE user_id='$user_id';")
 
 # Show student courses
 echo "===== Your courses ====="
 $MYSQL_CMD -e "
-SELECT Courses.course_id, Courses.course_name 
+SELECT Courses.course_id, Courses.course_code, Courses.course_name 
 FROM Courses 
 JOIN Registrations ON Courses.course_id = Registrations.course_id 
 WHERE Registrations.student_id='$student_id';
@@ -70,10 +71,11 @@ if [ "$course_exists" -eq 0 ]; then
 fi
 
 # Check if the student is registered
-exists=$($MYSQL_CMD -e "
-SELECT * FROM Registrations 
+exists=$($MYSQL_CMD -sse "
+SELECT COUNT(*) 
+FROM Registrations 
 WHERE student_id='$student_id' AND course_id='$course_id';
-" | wc -l)
+")
 
 # Delete student from course
 if [ "$exists" -gt 0 ]; then

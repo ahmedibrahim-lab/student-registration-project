@@ -6,7 +6,7 @@ ENVIRONMENT="codespaces"
 # Database credentials for local environment
 LOCAL_USER="root"
 LOCAL_PASSWORD="root_password"
-LOCAL_DB="appDb"
+LOCAL_DB="StudentRegistration"
 LOCAL_HOST="127.0.0.1"
 LOCAL_PORT="3306"
 
@@ -37,7 +37,7 @@ elif [ "$ENVIRONMENT" == "codespaces" ]; then
 fi
 
 # Retrieve and display all students
-$MYSQL_CMD -e "SELECT student_id, name, email, phone FROM Students;"
+$MYSQL_CMD -e "SELECT * FROM Students;"
 
 if [ $? -eq 0 ]; then
     echo "Successfully retrieved student information."

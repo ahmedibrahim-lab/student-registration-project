@@ -3,7 +3,9 @@
 username=$1
 
 while true; do
+    echo "=================================================="
     echo "Welcome, $username! You are logged in as an admin."
+    echo "=================================================="
     echo "Please choose an option:"
     echo "1. View all students"
     echo "2. View all courses"
