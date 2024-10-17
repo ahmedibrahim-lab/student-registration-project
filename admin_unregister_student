@@ -1,0 +1,35 @@
+#!/bin/bash
+
+# Database credentials (LOCAL)
+USER="root"
+PASSWORD="root_password"
+DB="appDb"
+HOST="127.0.0.1"
+PORT="3306"
+
+# Database credentials (CODESPACES)
+#USER="root"
+#DB="StudentRegistration"
+
+# Prompt admin for the student username and course code
+echo "Enter the username of the student to unregister:"
+read username
+
+echo "Enter the course code (e.g., CS101) to unregister the student from:"
+read course_code
+
+# Find student ID and course ID
+# LOCAL
+student_id=$(mysql -u $USER -p$PASSWORD -h $HOST -P $PORT -D $DB -e "SELECT student_id FROM Students WHERE student_id=(SELECT user_id FROM Users WHERE username='$username');")
+course_id=$(mysql -u $USER -p$PASSWORD -h $HOST -P $PORT -D $DB -e "SELECT course_id FROM Courses WHERE course_code='$course_code';")
+# CODESPACES
+#student_id=$(sudo mysql -u $USER -D $DB -s -N -e "SELECT student_id FROM Students WHERE student_id=(SELECT user_id FROM Users WHERE username='$username');")
+#course_id=$(sudo mysql -u $USER -D $DB -s -N -e "SELECT course_id FROM Courses WHERE course_code='$course_code';")
+
+# Unregister the student from the course
+# LOCAL
+mysql -u $USER -p$PASSWORD -h $HOST -P $PORT -D $DB -e "DELETE FROM Registrations WHERE student_id='$student_id' AND course_id='$course_id';"
+# CODESPACES
+#sudo mysql -u $USER -D $DB -e "DELETE FROM Registrations WHERE student_id='$student_id' AND course_id='$course_id';"
+
+echo "Student $username has been successfully unregistered from course $course_code!"
