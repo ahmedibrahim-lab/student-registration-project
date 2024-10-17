@@ -6,7 +6,7 @@ ENVIRONMENT="codespaces"
 # Database credentials for local environment
 LOCAL_USER="root"
 LOCAL_PASSWORD="root_password"
-LOCAL_DB="appDb"
+LOCAL_DB="StudentRegistration"
 LOCAL_HOST="127.0.0.1"
 LOCAL_PORT="3306"
 
@@ -36,6 +36,11 @@ elif [ "$ENVIRONMENT" == "codespaces" ]; then
     MYSQL_CMD="sudo mysql -u $USER -D $DB -s -N"
 fi
 
+# Remove session files from last login
+if [ -f session.txt ]; then
+    rm session.txt
+fi
+
 # Prompt user for input
 echo "Enter your username:"
 read username
@@ -47,15 +52,19 @@ read -s password
 hashed_password=$(echo -n "$password" | md5sum | awk '{print $1}')
 
 # Check if the username and password match
-user_info=$($MYSQL_CMD -e "SELECT username, role FROM Users WHERE username='$username' AND password='$hashed_password';")
+user_info=$($MYSQL_CMD -e "SELECT user_id, username, role FROM Users WHERE username='$username' AND password='$hashed_password';")
 
 if [ -z "$user_info" ]; then
     echo "Invalid username or password."
     exit 1
 else
-    username=$(echo $user_info | awk '{print $1}')
-    role=$(echo $user_info | awk '{print $2}')
+    user_id=$(echo $user_info | awk '{print $1}')
+    username=$(echo $user_info | awk '{print $2}')
+    role=$(echo $user_info | awk '{print $3}')
     echo "Login successful! Welcome, $username."
+    echo "user_id=$user_id" >> session.txt
+    echo "username=$username" >> session.txt
+    echo "role=$role" >> session.txt
 
     # Redirect based on role (student or admin)
     ./auth.sh $username $role

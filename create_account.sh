@@ -6,7 +6,7 @@ ENVIRONMENT="codespaces"
 # Database credentials for local environment
 LOCAL_USER="root"
 LOCAL_PASSWORD="root_password"
-LOCAL_DB="appDb"
+LOCAL_DB="StudentRegistration"
 LOCAL_HOST="127.0.0.1"
 LOCAL_PORT="3306"
 
@@ -63,10 +63,16 @@ if [ $user_exists -eq 0 ]; then
     $MYSQL_CMD -e "INSERT INTO Users (username, password, role) VALUES ('$username', '$hashed_password', 'student');"
     
     # Get the newly created user_id
-    user_id=$($MYSQL_CMD -e "SELECT user_id FROM Users WHERE username='$username';")
+    user_id=$($MYSQL_CMD -sse "SELECT user_id FROM Users WHERE username='$username';") 
+    
+    # Check if user_id was successfully retrieved
+    if [ -z "$user_id" ]; then
+        echo "Failed to retrieve user_id."
+        exit 1
+    fi
     
     # Insert additional details into the 'students' table
-    $MYSQL_CMD -e "INSERT INTO Students (student_id, name, email, phone) VALUES ('$user_id', '$name', '$email', '$phone');"
+    $MYSQL_CMD -e "INSERT INTO Students (user_id, name, email, phone) VALUES ('$user_id','$name', '$email', '$phone');"
     
     echo "Account created successfully!"
 else

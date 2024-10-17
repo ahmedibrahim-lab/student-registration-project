@@ -6,7 +6,7 @@ ENVIRONMENT="codespaces"
 # Database credentials for local environment
 LOCAL_USER="root"
 LOCAL_PASSWORD="root_password"
-LOCAL_DB="appDb"
+LOCAL_DB="StudentRegistration"
 LOCAL_HOST="127.0.0.1"
 LOCAL_PORT="3306"
 
@@ -58,6 +58,6 @@ hashed_password=$(echo -n "$password" | md5sum | awk '{print $1}')
 # Insert the student into the Users and Students tables
 $MYSQL_CMD -e "INSERT INTO Users (username, password, role) VALUES ('$username', '$hashed_password', 'student');"
 user_id=$($MYSQL_CMD -e "SELECT user_id FROM Users WHERE username='$username';")
-$MYSQL_CMD -e "INSERT INTO Students (student_id, name, email, phone) VALUES ('$user_id', '$name', '$email', '$phone');"
+$MYSQL_CMD -e "INSERT INTO Students (user_id, name, email, phone) VALUES ('$user_id', '$name', '$email', '$phone');"
 
 echo "Student $name has been successfully created!"
