@@ -1,11 +1,11 @@
 #!/bin/bash
 
 # Environment switch: Set to either "local" or "codespaces"
-ENVIRONMENT="codespaces"
+ENVIRONMENT="local"
 
 # Database credentials for local environment
 LOCAL_USER="root"
-LOCAL_PASSWORD="root_password"
+LOCAL_PASSWORD="root"
 LOCAL_DB="StudentRegistration"
 LOCAL_HOST="127.0.0.1"
 LOCAL_PORT="3306"

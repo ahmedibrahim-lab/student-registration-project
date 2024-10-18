@@ -1,7 +1,7 @@
 #!/bin/bash
 
 # Environment switch: Set to either "local" or "codespaces"
-ENVIRONMENT="codespaces"
+ENVIRONMENT="local"
 
 # Database credentials for local environment
 LOCAL_USER="root"
@@ -58,7 +58,7 @@ WHERE Registrations.student_id = '$student_id';
 # Show available courses to register for
 echo "Available courses: "
 $MYSQL_CMD -e "
-SELECT course_id, course_name, description, credits 
+SELECT * 
 FROM Courses 
 WHERE course_id NOT IN (
     SELECT course_id FROM Registrations WHERE student_id='$student_id'
@@ -82,8 +82,8 @@ fi
 
 # Register the user for the selected course
 $MYSQL_CMD -e "
-INSERT INTO Registrations (student_id, course_id)
-VALUES ('$student_id', '$course_id');
+INSERT INTO Registrations (student_id, course_id, registration_date)
+VALUES ('$student_id', '$course_id', CURDATE());
 "
 
 echo "You $student_id got registered for course: $course_id"

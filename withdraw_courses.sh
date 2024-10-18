@@ -1,11 +1,11 @@
 #!/bin/bash
 
 # Environment switch: Set to either "local" or "codespaces"
-ENVIRONMENT="codespaces"
+ENVIRONMENT="local"
 
 # Database credentials for local environment
 LOCAL_USER="root"
-LOCAL_PASSWORD="root_password"
+LOCAL_PASSWORD="root"
 LOCAL_DB="StudentRegistration"
 LOCAL_HOST="127.0.0.1"
 LOCAL_PORT="3306"
@@ -29,7 +29,7 @@ if [ "$ENVIRONMENT" == "local" ]; then
     DB=$LOCAL_DB
     HOST=$LOCAL_HOST
     PORT=$LOCAL_PORT
-    MYSQL_CMD="mysql -u $USER -p$PASSWORD -h $HOST -P $PORT -D $DB"
+    MYSQL_CMD="mysql -u $USER -p$PASSWORD -h $HOST -P $PORT -D $DB -s -N"
 elif [ "$ENVIRONMENT" == "codespaces" ]; then
     USER=$CODESPACES_USER
     DB=$CODESPACES_DB
@@ -42,18 +42,21 @@ if [ ! -f session.txt ]; then
     exit 1
 fi
 
-# Get the ID of the logged-in user
+# Get the student's ID
 user_id=$(cat session.txt | grep "user_id" | awk -F= '{print $2}')
-student_id=$($MYSQL_CMD -e "SELECT student_id FROM Students WHERE user_id='$user_id';")
+role=$(cat session.txt | grep "role" | awk -F= '{print $2}')
 
-# Show student courses
-echo "===== Your courses ====="
-$MYSQL_CMD -e "
-SELECT Courses.course_id, Courses.course_code, Courses.course_name 
-FROM Courses 
-JOIN Registrations ON Courses.course_id = Registrations.course_id 
-WHERE Registrations.student_id='$student_id';
-"
+if [ "$role" == "student" ]; then
+    student_id=$($MYSQL_CMD -e "SELECT student_id FROM Students WHERE user_id='$user_id';")
+
+    # Show the student's registered courses
+    echo "===== Your courses ====="
+    $MYSQL_CMD -e "
+    SELECT Courses.course_id, Courses.course_code, Courses.course_name          FROM Courses
+    JOIN Registrations ON Courses.course_id = Registrations.course_id
+    WHERE Registrations.student_id = '$student_id';
+    "
+fi
 
 echo "Insert the ID of the course you want to withdraw from: "
 read course_id
