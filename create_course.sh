@@ -43,13 +43,13 @@ read course_code
 echo "Enter the course name:"
 read course_name
 
-echo "Enter the instructor's name:"
-read instructor
+echo "Enter a description of the course:"
+read description
 
 echo "Enter the number of credits for the course:"
 read credits
 
 # Insert the course into the Courses table
-$MYSQL_CMD -e "INSERT INTO Courses (course_code, course_name, instructor, credits) VALUES ('$course_code', '$course_name', '$instructor', '$credits');"
+$MYSQL_CMD -e "INSERT INTO Courses (course_code, course_name, description, credits) VALUES ('$course_code', '$course_name', '$description', '$credits');"
 
 echo "Course $course_name has been successfully created!"

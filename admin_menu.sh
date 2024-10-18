@@ -3,8 +3,11 @@
 username=$1
 
 while true; do
+    echo
+    echo
+    echo
     echo "=================================================="
-    echo "Welcome, $username! You are logged in as an admin."
+    echo "Welcome! You are logged in as an admin."
     echo "=================================================="
     echo "Please choose an option:"
     echo "1. View all students"

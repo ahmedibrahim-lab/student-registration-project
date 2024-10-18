@@ -1,7 +1,7 @@
 #!/bin/bash
 
 # Environment switch: Set to either "local" or "codespaces"
-ENVIRONMENT="local"
+ENVIRONMENT="codespaces"
 
 # Database credentials for local environment
 LOCAL_USER="root"
@@ -82,8 +82,8 @@ fi
 
 # Register the user for the selected course
 $MYSQL_CMD -e "
-INSERT INTO Registrations (student_id, course_id, registration_date)
-VALUES ('$student_id', '$course_id', CURDATE());
+INSERT INTO Registrations (student_id, course_id)
+VALUES ('$student_id', '$course_id');
 "
 
 echo "You $student_id got registered for course: $course_id"

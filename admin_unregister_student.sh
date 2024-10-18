@@ -44,7 +44,7 @@ echo "Enter the course code (e.g., CS101) to unregister the student from:"
 read course_code
 
 # Find student ID and course ID
-student_id=$($MYSQL_CMD -e "SELECT student_id FROM Students WHERE student_id=(SELECT user_id FROM Users WHERE username='$username');")
+student_id=$($MYSQL_CMD -e "SELECT student_id FROM Students WHERE user_id=(SELECT user_id FROM Users WHERE username='$username');")
 course_id=$($MYSQL_CMD -e "SELECT course_id FROM Courses WHERE course_code='$course_code';")
 
 # Unregister the student from the course

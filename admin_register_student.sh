@@ -44,10 +44,12 @@ echo "Enter the course code (e.g., CS101) to register the student for:"
 read course_code
 
 # Find student ID and course ID
-student_id=$($MYSQL_CMD -e "SELECT student_id FROM Students WHERE student_id=(SELECT user_id FROM Users WHERE username='$username');")
+student_id=$($MYSQL_CMD -e "SELECT student_id FROM Students WHERE user_id=(SELECT user_id FROM Users WHERE username='$username');")
 course_id=$($MYSQL_CMD -e "SELECT course_id FROM Courses WHERE course_code='$course_code';")
 
 # Register the student for the course
-$MYSQL_CMD -e "INSERT INTO Registrations (student_id, course_id, registration_date) VALUES ('$student_id', '$course_id', CURDATE());"
+$MYSQL_CMD -e "INSERT INTO Registrations (student_id, course_id) VALUES ('$student_id', '$course_id');"
 
-echo "Student $username has been successfully registered for course $course_code!"
+student_name=$($MYSQL_CMD -e "SELECT name FROM Students WHERE user_id=(SELECT user_id FROM Users WHERE username='$username');")
+
+echo "Student $student_name has been successfully registered for course $course_code!"
