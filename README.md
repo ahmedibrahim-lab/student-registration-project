@@ -84,11 +84,11 @@ This table holds additional information about students. It links to the Users ta
 
 | Column      | Data Type         | Description                                                         |
 |-------------|-------------------|---------------------------------------------------------------------|
-| student_id  | INT (PK)          |  This ensures that each student has a corresponding user account.   |
+| student_id  | INT (PK)          |  Auto-incremented primary key for each user.                       |
+| user_id     | INT (FK)          | References `user_id` from the Users table.                         |
 | name        | VARCHAR(100)      | Full name of the student.                                          |
 | email       | VARCHAR(100)      | Email address of the student.                                      |
 | phone       | VARCHAR(20)       | Contact number of the student.                                     |
-| user_id     | INT (FK)          | References `user_id` from the Users table.                         |
 
 **Primary Key:** `student_id`  
 **Foreign Key:** `user_id` references `user_id` in the Users table.  
@@ -104,7 +104,7 @@ This table stores details of courses that students can register for.
 | course_id   | INT (PK)          | Auto-incremented primary key for each course.                     |
 | course_code  | VARCHAR(10)       | Unique course code (e.g., CS101).                                 |
 | course_name | VARCHAR(100)      | The name of the course.                                           |
-| instructor  | VARCHAR(100)      | Name of the course instructor.                                    |
+| description  | VARCHAR(100)      | A description of the course.                                    |
 | credits     | INT               | Number of credits the course is worth.                             |
 
 **Primary Key:** `course_id`  
