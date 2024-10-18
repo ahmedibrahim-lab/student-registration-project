@@ -58,10 +58,10 @@ INSERT INTO Students (user_id, name, email, phone) VALUES
 
 -- Step 9: Insert dummy values into Courses
 INSERT INTO Courses (course_code, course_name, description, credits) VALUES 
-('CS101', 'Introduction to Computer Science', 'Learn the basics of computer science.', 3),
-('MATH101', 'Calculus I', 'An introduction to calculus concepts and techniques.', 4),
-('ENG101', 'English Composition', 'Develop writing skills and techniques.', 3),
-('HIST101', 'World History', 'Overview of world history from ancient to modern times.', 3);
+('CS101', 'Introduction to Computer Science', 'Learn the basics of computer science.', 10),
+('MATH101', 'Calculus I', 'An introduction to calculus concepts and techniques.', 10),
+('ENG101', 'English Composition', 'Develop writing skills and techniques.', 20),
+('HIST101', 'World History', 'Overview of world history from ancient to modern times.', 10);
 
 -- Step 10: Register students for courses with registration dates
 INSERT INTO Registrations (student_id, course_id) VALUES 

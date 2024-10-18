@@ -1,7 +1,7 @@
 #!/bin/bash
 
 # Environment switch: Set to either "local" or "codespaces"
-ENVIRONMENT="local"
+ENVIRONMENT="codespaces"
 
 # Database credentials for local environment
 LOCAL_USER="root"
